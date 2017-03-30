@@ -2,11 +2,12 @@ package geteventstore
 
 import (
 	"github.com/jetbasrawi/go.geteventstore"
-	"github.com/telegraf"
 	"strings"
 	"fmt"
 	"net/http"
 	"encoding/json"
+	"github.com/influxdata/telegraf"
+	"github.com/influxdata/telegraf/plugins/inputs"
 )
 
 type SReader interface {
@@ -24,6 +25,26 @@ type TelegrafGetEventStore struct {
 	Client     *goes.Client
 }
 
+const sampleConfig = `
+	## Specify eventstore url
+	url="http://127.0.0.1:2113"
+
+	## specify login
+	login="admin"
+	## specify password
+	password="changeit"
+	## specify stats stream name
+	streamname="$stats-0.0.0.0:2113"
+`
+
+func (*TelegrafGetEventStore) SampleConfig() string {
+	return sampleConfig
+}
+
+func (*TelegrafGetEventStore) Description() string {
+	return "Read stats from one eventstore"
+}
+
 func (store *TelegrafGetEventStore) createClient(httpClient *http.Client) {
 	client, _ := goes.NewClient(httpClient, store.Url)
 	client.SetBasicAuth(store.Login, store.Password)
@@ -32,7 +53,10 @@ func (store *TelegrafGetEventStore) createClient(httpClient *http.Client) {
 
 func (store *TelegrafGetEventStore) getLastEvent() (*goes.EventResponse, error){
 	path, _ := store.Client.GetFeedPath(store.StreamName, "backward", -1, 1)
-	f, _, _ := store.Client.ReadFeed(path)
+	f, _, err := store.Client.ReadFeed(path)
+	if err != nil {
+		return nil, err
+	}
 	numEntries := len(f.Entry)
 	index := numEntries - 1
 	entry := f.Entry[index]
@@ -57,7 +81,7 @@ func (store *TelegrafGetEventStore) Scan(eventResponse *goes.EventResponse, e in
 	if m != nil && eventResponse.Event.MetaData != nil {
 		meta, ok := eventResponse.Event.MetaData.(*json.RawMessage)
 		if !ok {
-			return fmt.Errorf("Could not unmarshal the event. Event data is not of type *json.RawMessage")
+			return fmt.Errorf("Could not unmarshal the event. Event meta data is not of type *json.RawMessage")
 		}
 
 		if err := json.Unmarshal(*meta, &m); err != nil {
@@ -74,7 +98,6 @@ func (store *TelegrafGetEventStore) Gather(acc telegraf.Accumulator) error {
 	}
 	fields := make(map[string]interface{})
 	tags := make(map[string]string)
-
 	event, err := store.getLastEvent()
 
 	if err != nil {
@@ -107,6 +130,11 @@ func (store *TelegrafGetEventStore) Gather(acc telegraf.Accumulator) error {
 	}
 
 	acc.AddFields("es-queue", fields, tags)
-
 	return nil
+}
+
+func init() {
+	inputs.Add("geteventstore", func() telegraf.Input {
+		return &TelegrafGetEventStore{}
+	})
 }
