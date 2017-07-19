@@ -20,20 +20,20 @@ For more information on Processor and Aggregator plugins please [read this](./do
 New plugins are designed to be easy to contribute,
 we'll eagerly accept pull
 requests and will manage the set of plugins that Telegraf supports.
-See the [contributing guide](CONTRIBUTING.md) for instructions on writing
-new plugins.
+
+## Contributing
+
+There are many ways to contribute:
+- Fix and [report bugs](https://github.com/influxdata/telegraf/issues/new)
+- [Improve documentation](https://github.com/influxdata/telegraf/issues?q=is%3Aopen+label%3Adocumentation)
+- [Review code and feature proposals](https://github.com/influxdata/telegraf/pulls)
+- Answer questions on github and on the [Community Site](https://community.influxdata.com/)
+- [Contribute plugins](CONTRIBUTING.md)
 
 ## Installation:
 
-You can either download the binaries directly from the
-[downloads](https://www.influxdata.com/downloads) page.
-
-A few alternate installs are available here as well:
-
-### FreeBSD tarball:
-
-Latest:
-* https://dl.influxdata.com/telegraf/releases/telegraf-VERSION_freebsd_amd64.tar.gz
+You can download the binaries directly from the [downloads](https://www.influxdata.com/downloads) page
+or from the [releases](https://github.com/influxdata/telegraf/releases) section.
 
 ### Ansible Role:
 
@@ -74,7 +74,7 @@ telegraf --input-filter cpu --output-filter influxdb config
 #### Run a single telegraf collection, outputing metrics to stdout
 
 ```
-telegraf --config telegraf.conf -test
+telegraf --config telegraf.conf --test
 ```
 
 #### Run telegraf with all plugins defined in config file
@@ -86,7 +86,7 @@ telegraf --config telegraf.conf
 #### Run telegraf, enabling the cpu & memory input, and influxdb output plugins
 
 ```
-telegraf --config telegraf.conf -input-filter cpu:mem -output-filter influxdb
+telegraf --config telegraf.conf -input-filter cpu:mem --output-filter influxdb
 ```
 
 
@@ -111,21 +111,27 @@ configuration options.
 * [couchbase](./plugins/inputs/couchbase)
 * [couchdb](./plugins/inputs/couchdb)
 * [disque](./plugins/inputs/disque)
+* [dmcache](./plugins/inputs/dmcache)
 * [dns query time](./plugins/inputs/dns_query)
 * [docker](./plugins/inputs/docker)
 * [dovecot](./plugins/inputs/dovecot)
 * [elasticsearch](./plugins/inputs/elasticsearch)
 * [exec](./plugins/inputs/exec) (generic executable plugin, support JSON, influx, graphite and nagios)
+* [fail2ban](./plugins/inputs/fail2ban)
 * [filestat](./plugins/inputs/filestat)
+* [fluentd](./plugins/inputs/fluentd)
+* [graylog](./plugins/inputs/graylog)
 * [haproxy](./plugins/inputs/haproxy)
 * [hddtemp](./plugins/inputs/hddtemp)
 * [http_response](./plugins/inputs/http_response)
 * [httpjson](./plugins/inputs/httpjson) (generic JSON-emitting http service plugin)
 * [internal](./plugins/inputs/internal)
 * [influxdb](./plugins/inputs/influxdb)
+* [interrupts](./plugins/inputs/interrupts)
 * [ipmi_sensor](./plugins/inputs/ipmi_sensor)
 * [iptables](./plugins/inputs/iptables)
 * [jolokia](./plugins/inputs/jolokia)
+* [kapacitor](./plugins/inputs/kapacitor)
 * [kubernetes](./plugins/inputs/kubernetes)
 * [leofs](./plugins/inputs/leofs)
 * [lustre2](./plugins/inputs/lustre2)
@@ -146,7 +152,7 @@ configuration options.
 * [postgresql_extensible](./plugins/inputs/postgresql_extensible)
 * [powerdns](./plugins/inputs/powerdns)
 * [procstat](./plugins/inputs/procstat)
-* [prometheus](./plugins/inputs/prometheus)
+* [prometheus](./plugins/inputs/prometheus) (can be used for [Caddy server](./plugins/inputs/prometheus/README.md#usage-for-caddy-http-server))
 * [puppetagent](./plugins/inputs/puppetagent)
 * [rabbitmq](./plugins/inputs/rabbitmq)
 * [raindrops](./plugins/inputs/raindrops)
@@ -174,6 +180,7 @@ configuration options.
     * processes
     * kernel (/proc/stat)
     * kernel (/proc/vmstat)
+    * linux_sysctl_fs (/proc/sys/fs)
 
 Telegraf can also collect metrics via the following service plugins:
 
@@ -193,6 +200,17 @@ Telegraf can also collect metrics via the following service plugins:
   * [github](./plugins/inputs/webhooks/github)
   * [mandrill](./plugins/inputs/webhooks/mandrill)
   * [rollbar](./plugins/inputs/webhooks/rollbar)
+  * [papertrail](./plugins/inputs/webhooks/papertrail)
+
+Telegraf is able to parse the following input data formats into metrics, these
+formats may be used with input plugins supporting the `data_format` option:
+
+* [InfluxDB Line Protocol](./docs/DATA_FORMATS_INPUT.md#influx)
+* [JSON](./docs/DATA_FORMATS_INPUT.md#json)
+* [Graphite](./docs/DATA_FORMATS_INPUT.md#graphite)
+* [Value](./docs/DATA_FORMATS_INPUT.md#value)
+* [Nagios](./docs/DATA_FORMATS_INPUT.md#nagios)
+* [Collectd](./docs/DATA_FORMATS_INPUT.md#collectd)
 
 ## Processor Plugins
 
@@ -228,9 +246,3 @@ Telegraf can also collect metrics via the following service plugins:
 * [socket_writer](./plugins/outputs/socket_writer)
 * [tcp](./plugins/outputs/socket_writer)
 * [udp](./plugins/outputs/socket_writer)
-
-## Contributing
-
-Please see the
-[contributing guide](CONTRIBUTING.md)
-for details on contributing a plugin to Telegraf.
